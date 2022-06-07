@@ -2,6 +2,7 @@
 #![no_main]
 
 use core::panic::PanicInfo;
+mod screen;
 
 static HELLO: &[u8] = b"Hello World!";
 
@@ -13,15 +14,8 @@ fn panic(_info: &PanicInfo) -> ! {
 
 
 #[no_mangle]
-pub extern "C" fn _start() -> ! {
-    let vga = 0xB8000 as *mut u8;
-
-    for (i, &byte) in HELLO.iter().enumerate() {
-        unsafe {
-            *vga.offset(i as isize * 2) = byte;
-            *vga.offset(i as isize * 2 + 1) = 0xB;
-        }
-    }
-
+pub extern "C" fn _start() -> ! { 
+    let mut screen = screen::Screen::new(0, 0xB);
+    screen.writestr(&HELLO);
     loop {}
 }
